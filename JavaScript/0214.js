@@ -7,6 +7,7 @@
 너무 유연한 언어 파이썬과 마찬가지, 느슨한 타입 체크때문에 힘들수 있음
 */
 
+//3.1
 // 숫자 타입
 var intNum = 10;
 var floatNum = 0.1;
@@ -111,6 +112,7 @@ for (var prop in foo4) {     // foo4 순회
 delete foo4.name;
 console.log(foo4.name); //undefined
 
+//3.2 3.3
 // 객체 = 참조타입
 
 var objA = {
@@ -157,6 +159,7 @@ console.log(a);     //100  <- 기본타입은 call by value
 console.log(objA);  //200  <- 참조 타입은 call by reference
 
 /*
+3.4
 프로토타입
 모든 객체는 자신의 부모 역할을 하는 객체와 연결되어 있다. 상속과 비슷
 부모 객체 = 프로토타입 객체 or 프로토타입
@@ -170,6 +173,7 @@ var foo5 = {
 console.log(foo5.toString());   //foo5의 프로토타입에 toString이 정의되어 있음
 console.dir(foo5);
 
+//3.5
 //배열
 var colorArr = ['orange', 'yellow', 'blue', 'green', 'red'];
 console.log(colorArr[0]);
@@ -195,6 +199,221 @@ console.log(arr);           //[0, 1, 2, empty × 2]
 arr.length = 2;             // 배열의 범위를 바꿔버림
 console.log(arr);           //[0, 1]
 console.log(arr[2]);        //undefined
+
+//배열 표준 메서드
+var arr = ['zero', 'one', 'two'];
+
+arr.push('three');
+console.log(arr);   //["zero", "one", "two", "three"]
+
+arr.length = 5;
+arr.push('four');
+console.log(arr);   //["zero", "one", "two", "three", empty, "four"]
+
+//배열과 객체의 차이점
+
+var colorsArray = ['orange', 'yellow', 'green'];
+console.log(colorsArray[0]);    //orange
+console.log(colorsArray[1]);    //yellow
+console.log(colorsArray[2]);    //green
+
+//colorsObj 객체
+var colorsObj = {
+    '0': 'orange',
+    '1': 'yellow',
+    '2': 'green'
+};
+console.log(colorsObj[0]);  // orange
+console.log(colorsObj[1]);  // yellow
+console.log(colorsObj[2]);  // green
+
+console.log(typeof colorsArray);    //object
+console.log(typeof colorsObj);      //object
+
+console.log(colorsArray.length);    //3
+console.log(colorsObj.length);      //undefined
+
+colorsArray.push('red');    //
+colorsObj.push('res');      //에러 push는 표준 배열 메서드임 서로 부모 프로토타입이 다름
+
+//배열프로토타입 : Array.prototype, 객체 르로토타입 : Object.prototype
+//Array.prototype의 프로토타입은 Object.prototype이다
+//따라서 배열은 두 프로토타입 내부의 메서드를 모두 사용 가능하다.
+
+var emptyArray = [];    //빈 배열
+var emptyObj = {};      //빈 객체
+
+console.dir(emptyArray.__proto__);
+console.dir(emptyObj.__proto__);
+
+/*
+Array(0)
+concat: ƒ concat()
+constructor: ƒ Array()
+copyWithin: ƒ copyWithin()
+entries: ƒ entries()
+every: ƒ every()
+fill: ƒ fill()
+filter: ƒ filter()
+find: ƒ find()
+findIndex: ƒ findIndex()
+flat: ƒ flat()
+flatMap: ƒ flatMap()
+forEach: ƒ forEach()
+includes: ƒ includes()
+indexOf: ƒ indexOf()
+join: ƒ join()
+keys: ƒ keys()
+lastIndexOf: ƒ lastIndexOf()
+length: 0
+map: ƒ map()
+pop: ƒ pop()
+push: ƒ push()
+reduce: ƒ reduce()
+reduceRight: ƒ reduceRight()
+reverse: ƒ reverse()
+shift: ƒ shift()
+slice: ƒ slice()
+some: ƒ some()
+sort: ƒ sort()
+splice: ƒ splice()
+toLocaleString: ƒ toLocaleString()
+toString: ƒ toString()
+unshift: ƒ unshift()
+values: ƒ values()
+Symbol(Symbol.iterator): ƒ values()
+Symbol(Symbol.unscopables): {copyWithin: true, entries: true, fill: true, find: true, findIndex: true, …}
+__proto__: Object
+
+Object
+constructor: ƒ Object()
+hasOwnProperty: ƒ hasOwnProperty()
+isPrototypeOf: ƒ isPrototypeOf()
+propertyIsEnumerable: ƒ propertyIsEnumerable()
+toLocaleString: ƒ toLocaleString()
+toString: ƒ toString()
+valueOf: ƒ valueOf()
+__defineGetter__: ƒ __defineGetter__()
+__defineSetter__: ƒ __defineSetter__()
+__lookupGetter__: ƒ __lookupGetter__()
+__lookupSetter__: ƒ __lookupSetter__()
+get __proto__: ƒ __proto__()
+set __proto__: ƒ __proto__()
+*/
+
+//배열의 프로퍼티 동적생성
+var arr = ['zero','one','two'];
+console.log(arr.length);    //3
+
+arr.color = 'blue';
+arr.name = 'number_array';
+console.log(arr.length);    //3 가장 큰 인덱스가 변했을경우만 변경된다.
+
+arr[3] = 'red';
+console.log(arr.length);    //4
+
+console.dir(arr);
+/*
+    Array(4)
+    0: "zero"
+    1: "one"
+    2: "two"
+    3: "red"
+    color: "blue"
+    name: "number_array"
+    length: 4
+    __proto__: Array(0)
+*/
+
+//배열의 프로퍼티 열거
+for (var prop in arr) {
+    console.log(prop, arr[prop]);
+}
+/*
+0 zero
+1 one
+2 two
+3 red
+color blue
+name number_array
+*/
+
+for (var i=0; i<arr.length; i++) {
+    console.log(i, arr[i]);
+}
+
+/*
+0 "zero"
+1 "one"
+2 "two"
+3 "red"
+*/
+
+//배열 요소 삭제
+var arr = ['zero', 'one', 'two', 'three'];
+delete arr[2];              //해당 원소를 undefinded로 설정
+console.log(arr);           //["zero", "one", empty, "three"]
+console.log(arr.length);    //4
+
+arr.splice(2,1);            //2번째 요소를 시작점으로 1개의 원소 삭제
+console.log(arr);           //["zero", "one", "three"]
+console.log(arr.length);    //3
+
+//Array() 생성자 함수
+
+var foo = new Array(3);     
+console.log(foo);           //[empty × 3]
+console.log(foo.length);    //3
+
+var bar = new Array(1,2,3); 
+console.log(bar);           //[1, 2, 3]
+console.log(bar.length);    //3
+
+//유사 배열 객체
+//배열은 아닌데 length 프로퍼티를 가진 객체
+//객체이지만 표준 배열 메서드를 사용 가능함
+
+var arr = ['bar'];
+var obj = {name: 'foo', length: 1};
+
+arr.push('baz');
+console.log(arr);           //["bar", "baz"]
+
+Array.prototype.push.apply(obj, ['baz']);
+console.log(obj);           //{1: "baz", name: "foo", length: 2}
+
+//기본 타입을 위한 표준 메서드
+var num = 0.5;
+console.log(num.toExponential(1));  //5.0e-1
+console.log("test".charAt(2));      //s
+
+//연산자
+//+ 더하기, 문자열 연결
+var add1 = 1+2;
+var add2 = 'my'+'string';
+var add3 = 1+'string';
+var add4 = 'string'+2;
+
+console.log(add1);  //3
+console.log(add2);  //mystring
+console.log(add3);  //1stinrg
+console.log(add4);  //string2
+
+// == 동등 연산자 === 일치 연산자
+console.log(1=='1');    //true  type변환후 프로퍼티 비교
+console.log(1==='1');   //false
+
+//!!연산자 피연산자를 불린값으로 변경
+console.log(!!0);           // flase
+console.log(!!1);           // true
+console.log(!!'string');    // true
+console.log(!!'');          // flase
+console.log(!!true);        // true
+console.log(!!false);       // flase
+console.log(!!null);        // flase
+console.log(!!undefined);   // flase
+console.log(!!{});          // true
+console.log(!![1,2,3]);     // true
 
 
 
