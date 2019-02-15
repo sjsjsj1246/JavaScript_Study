@@ -302,7 +302,7 @@ set __proto__: ƒ __proto__()
 */
 
 //배열의 프로퍼티 동적생성
-var arr = ['zero','one','two'];
+var arr = ['zero', 'one', 'two'];
 console.log(arr.length);    //3
 
 arr.color = 'blue';
@@ -338,7 +338,7 @@ color blue
 name number_array
 */
 
-for (var i=0; i<arr.length; i++) {
+for (var i = 0; i < arr.length; i++) {
     console.log(i, arr[i]);
 }
 
@@ -355,17 +355,17 @@ delete arr[2];              //해당 원소를 undefinded로 설정
 console.log(arr);           //["zero", "one", empty, "three"]
 console.log(arr.length);    //4
 
-arr.splice(2,1);            //2번째 요소를 시작점으로 1개의 원소 삭제
+arr.splice(2, 1);            //2번째 요소를 시작점으로 1개의 원소 삭제
 console.log(arr);           //["zero", "one", "three"]
 console.log(arr.length);    //3
 
 //Array() 생성자 함수
 
-var foo = new Array(3);     
+var foo = new Array(3);
 console.log(foo);           //[empty × 3]
 console.log(foo.length);    //3
 
-var bar = new Array(1,2,3); 
+var bar = new Array(1, 2, 3);
 console.log(bar);           //[1, 2, 3]
 console.log(bar.length);    //3
 
@@ -374,7 +374,7 @@ console.log(bar.length);    //3
 //객체이지만 표준 배열 메서드를 사용 가능함
 
 var arr = ['bar'];
-var obj = {name: 'foo', length: 1};
+var obj = { name: 'foo', length: 1 };
 
 arr.push('baz');
 console.log(arr);           //["bar", "baz"]
@@ -389,10 +389,10 @@ console.log("test".charAt(2));      //s
 
 //연산자
 //+ 더하기, 문자열 연결
-var add1 = 1+2;
-var add2 = 'my'+'string';
-var add3 = 1+'string';
-var add4 = 'string'+2;
+var add1 = 1 + 2;
+var add2 = 'my' + 'string';
+var add3 = 1 + 'string';
+var add4 = 'string' + 2;
 
 console.log(add1);  //3
 console.log(add2);  //mystring
@@ -400,8 +400,8 @@ console.log(add3);  //1stinrg
 console.log(add4);  //string2
 
 // == 동등 연산자 === 일치 연산자
-console.log(1=='1');    //true  type변환후 프로퍼티 비교
-console.log(1==='1');   //false
+console.log(1 == '1');    //true  type변환후 프로퍼티 비교
+console.log(1 === '1');   //false
 
 //!!연산자 피연산자를 불린값으로 변경
 console.log(!!0);           // flase
@@ -413,7 +413,4 @@ console.log(!!false);       // flase
 console.log(!!null);        // flase
 console.log(!!undefined);   // flase
 console.log(!!{});          // true
-console.log(!![1,2,3]);     // true
-
-
-
+console.log(!![1, 2, 3]);     // true
