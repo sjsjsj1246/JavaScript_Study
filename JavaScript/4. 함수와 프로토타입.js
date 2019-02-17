@@ -170,7 +170,7 @@ console.log(myFunction.prototype.constructor);
  * 웹페이지가 로드되거나 키보드가 입력되는 등의 이벤트 발생시 실행 등등
  */
 
-
+/*
  < !DOCTYPE html >
     <html>
         <body>
@@ -182,7 +182,7 @@ console.log(myFunction.prototype.constructor);
          </script>
         </body>
     </html>
-
+*/
 // 즉시 실행 : 함수 익명함수 응용형태
 (function (name) {
     console.log('this is the immediate function ->' + name);
@@ -389,10 +389,36 @@ func3() called. this.value : 4
  * 3. 생성된 객체 리턴
  */
 
- var Person = function (name) {
-     this.name = name;
+ var Person = function (name, age, gender) {
+     this.name = name,
+     this.age = age,
+     this.gender = gender
  };
 
- var foo = new Person('foo');
- console.log(foo.name); //foo
+ var foo = new Person('foo', 33, 'woman');
+ console.dir(foo); //foo
+
+ var baz = new Person('baz', 25, 'woman');
+ console.dir(baz);
+//객체를 재생산해야 할 때는 이 방식이 좋음
+
+//new를 붙이지 않으면 오류가 생길 수 있기 때문에 주의, 이떄문에 강제로 인스턴스를 생성하게 만드는 패턴이 있다
+function A(arg) {
+    if(!(this instanceof arguments.callee))     //this가 A의 인스턴스인지 확인한다 아니면 new를 붙여서 A 실행
+        return new A(arg);
+    this.value = arg ? arg : 0;
+}
+
+var a = new A(100);
+var b = A(10);
+
+console.log(a.value);
+console.log(b.value);
+console.log(global.value);
+
+/**
+ * this를 특정  객체에 명시적으로 바인딩하는 법
+ * 함수 객체의 기본 프로퍼티에서 apply()와 call()메서드
+ * function.apply(thisArg, argArray); 형식으로 사용
+ */
 
