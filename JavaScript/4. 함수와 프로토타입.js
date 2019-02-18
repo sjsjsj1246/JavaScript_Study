@@ -1,3 +1,5 @@
+//4. 함수와 프로토타입
+
 //4.1 함수 정의 함수도 하나의 값처럼 취급됨
 /**
  * 함수 생성법:
@@ -389,22 +391,22 @@ func3() called. this.value : 4
  * 3. 생성된 객체 리턴
  */
 
- var Person = function (name, age, gender) {
-     this.name = name,
-     this.age = age,
-     this.gender = gender
- };
+var Person = function (name, age, gender) {
+    this.name = name,
+        this.age = age,
+        this.gender = gender
+};
 
- var foo = new Person('foo', 33, 'woman');
- console.dir(foo); //foo
+var foo = new Person('foo', 33, 'woman');
+console.dir(foo); //foo
 
- var baz = new Person('baz', 25, 'woman');
- console.dir(baz);
+var baz = new Person('baz', 25, 'woman');
+console.dir(baz);
 //객체를 재생산해야 할 때는 이 방식이 좋음
 
 //new를 붙이지 않으면 오류가 생길 수 있기 때문에 주의, 이떄문에 강제로 인스턴스를 생성하게 만드는 패턴이 있다
 function A(arg) {
-    if(!(this instanceof arguments.callee))     //this가 A의 인스턴스인지 확인한다 아니면 new를 붙여서 A 실행
+    if (!(this instanceof arguments.callee))     //this가 A의 인스턴스인지 확인한다 아니면 new를 붙여서 A 실행
         return new A(arg);
     this.value = arg ? arg : 0;
 }
@@ -420,5 +422,166 @@ console.log(global.value);
  * this를 특정  객체에 명시적으로 바인딩하는 법
  * 함수 객체의 기본 프로퍼티에서 apply()와 call()메서드
  * function.apply(thisArg, argArray); 형식으로 사용
+ * 본질적인 기능은 함수 호출
+ * Person.apply(a,b) 하면 Person의 this에 a바인딩, 인자로 b를 넘겨줌
  */
 
+function Person(name, age, gender) {
+    this.name = name;
+    this.age = age;
+    this.gender = gender;
+};
+
+var foo = {};
+Person.apply(foo, ['foo', 30, 'man']);
+//=Person.call(foo,'foo',30,'man');
+console.dir(foo);
+/*
+Object
+    age: 30
+    gender: "man"
+    name: "foo"
+    __proto__: Object
+*/
+
+//apply()를 사용하면 argument에 표준 배열 메서드를 사용 가능하다. pop(), shift() 같은
+
+function myFunction() {
+    console.dir(arguments);
+
+    var args = Array.prototype.slice.apply(arguments);
+    // Array.prototype.slice() 메서드를 호출하는데 이 때 this를 arguments로 바인딩한다.
+    // 즉 arguments.slice()처럼 사용하겠다는 의미
+    // slice()는 배열 슬라이싱 함수 인자를 넘겨주지 않으면 그대로 반환함
+    console.dir(args);
+}
+
+myFunction(1, 2, 3);
+
+/**
+ * 자바스크립트 함수는 항상 리턴값을 반환한다.
+ * 1. 일반 함수나 베서드는 리턴값을 지정하지 않을 경우 undefined 값이 리턴된다.
+ * 2. 생성자 함수에서 리턴값을 지정하지 않을 경우 생성된 객체가 리턴된다.
+ */
+
+// 4.5 프로토타입 체이닝
+// 프로토타입 기반의 객체지향 프로그래밍
+// 모든 객체는 자신을 생성한 생성자 함수의 protype 프로퍼티가 가리키는 프로토타입
+// 객체를 자신의 부모 객체로 설정하는 [[prototype]]링크로 연결한다.
+
+function Person(name) {
+    this.name = name;
+}
+
+var foo = new Person('foo');
+
+console.dir(Person);
+console.dir(foo);
+/*
+ƒ Person(name)
+    arguments: null
+    caller: null
+    length: 1
+    name: "Person"
+    prototype:
+        constructor: ƒ Person(name)
+        __proto__: Object
+    __proto__: ƒ ()
+    [[FunctionLocation]]: VM283:2
+    [[Scopes]]: Scopes[1]
+
+Person
+    name: "foo"
+    __proto__:
+        constructor: ƒ Person(name)
+        __proto__: Object
+*/
+
+// 객체 리터럴 방식으로 생성된 객체의 프로토타입 체이닝
+var myObject = {
+    name: 'foo',
+    sayName: function () {
+        console.log('My Name is ' + this.name);
+    }
+};
+
+myObject.sayName();         //My Name is foo
+console.log(myObject.hasOwnProperty('name'));       //true
+console.log(myObject.hasOwnProperty('nickName'));   //false
+// myObject 에는 hasOwnProperty()가 없으므로 [[prototype]] 링크를 찾아가서 실행한것이다
+// 이렇게 계속 링크를 타고 올라가서 찾는다. 이것이 프로토타입 체이닝
+myObject.sayNickName();     //error
+
+// Object.prototype 객체는 프로토타입 체이닝의 종점이다.
+
+// Number.prototype, String.prototype, Array.prototype 등등
+String.prototype.testMethod = function () {
+    console.log('this is the String.prototype.testMethod()');
+};
+
+var str = 'this is test';
+str.testMethod();       //str의 프로토타입에 testMethod 추가
+
+console.dir(String.prototype);
+
+// 프로토타입 메서드와 this 바인딩
+function Person(name) {
+    this.name =name;
+}
+
+Person.prototype.getName = function () {
+    return this.name;
+};
+
+var foo = new Person('foo');
+
+console.log(foo.getName());             //foo, this에 foo 바인딩
+
+Person.prototype.name = 'person';
+
+console.log(Person.prototype.getName());  //person, this에 prototype 바인딩
+
+//디폴트 프로토타입은 다른 객체로 변경이 가능하다.
+function Person(name) {
+    this.name;
+}
+console.log(Person.prototype.constructor);
+
+var foo = new Person('foo');
+console.log(foo.country);
+
+Person.prototype = {
+    country: 'korea'
+};
+console.log(Person.prototype.constructor);  //프로토타입 재정의
+
+var bar = new Person('bar');
+console.log(foo.country);
+console.log(bar.country);
+console.log(foo.constructor);
+console.log(bar.constructor);
+
+/*
+Person(name)
+undefined
+Object()
+Korea
+Person(name)
+Object
+*/
+
+//객체의 프로퍼티 읽기나 메서드를 실행할 때만 프로토타입 체이닝이 동작한다.
+function Person(name) {
+    this.name = name;
+}
+
+Person.prototype.country = 'korea';
+
+var foo = new Person('foo');
+var bar = new Person('bar');
+console.log(foo.country);   //korea
+console.log(bar.country);   //korea
+foo.country = 'USA';        //쓰기는 안됨 프로토타입에 쓰는 것이 아니라 foo에 새로 만들기 때문
+
+console.log(foo.country);   //USA   이건 프로토타입의 프로퍼티가 아니라 foo의 프로퍼티임
+console.log(bar.country);   //korea
