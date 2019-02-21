@@ -43,13 +43,13 @@ ExContext2();
  * 다음 단계에서는 arguments 객체를 생성한다. 활성 객체는 arguments 프로퍼티로 이 객체를 참조한다.
  */
 
- //5.2.3 스코프 정보 생성
- /**
-  * 현재 컨텍스트의 유효 범위를 나타내는 스코프 정보를 생성한다. 
-  * 이 정보는 컨텍스트 안에서 연결 리스트와 유사한 형식으로 만들어진다.
-  * 현재 컨텍스트에서 특정 변수에 접근해야 할 경우 이 리스트를 활용한다. 이 리스트를 스코프 체인이라고 한다 [[scope]]
-  * 활성 객체가 스코프 체인의 제일 앞에 추가되며 이 체인을 활용하여 변수 등에 접근할 수 있다.
-  */
+//5.2.3 스코프 정보 생성
+/**
+ * 현재 컨텍스트의 유효 범위를 나타내는 스코프 정보를 생성한다. 
+ * 이 정보는 컨텍스트 안에서 연결 리스트와 유사한 형식으로 만들어진다.
+ * 현재 컨텍스트에서 특정 변수에 접근해야 할 경우 이 리스트를 활용한다. 이 리스트를 스코프 체인이라고 한다 [[scope]]
+ * 활성 객체가 스코프 체인의 제일 앞에 추가되며 이 체인을 활용하여 변수 등에 접근할 수 있다.
+ */
 
 //5.2.4 변수 생성
 /**
@@ -104,5 +104,113 @@ func();
 console.log(var1);  //1
 console.log(var2);  //2
 /**
- * 전역 실행 컨텍스트 생성 -> func()함수 객체 생성 -> func()의 [[scope]]는 전역 변수객체가 됨
+ * 전역 실행 컨텍스트 생성 -> func()함수 객체 생성 -> func()의 [[scope]] = 전역 변수객체 -> func의 컨텍스트 생성
+ * -> func()의 [[scope]]맨 앞에 func의 변수 객체를 넣는다.
+ * 스코프 체인 = 현재 실행 컨텍스트의 변수객체 + 상위 컨텍스트의 스코프 체인
  */
+
+//5.4 클로저 : 이미 생명 주기가 끝난 외부 함수의 변수를 참조하는 함수
+
+function outerFunc() {
+    var x = 10;
+    var innerFunc = function () { console.log(x); }
+    return innerFunc;
+}
+
+var inner = outerFunc();
+inner();    //outerFunc컨텍스트는 사라졌지만 Inner스코프 체인에는 남아있어서 참조 가능하다.
+
+//예제
+function outerFunc() {
+    var x = 1;
+
+    return function () {
+        // x와 arguments를 활용한 로직;
+    }
+}
+
+var new_func = outerFunc();
+new_func();
+
+//5.4.2 클로저의 활용 -> 함수형 프로그래밍, 경험 중요
+function HelloFUnc(func) {
+    this.greeting = "hello";
+}
+
+HelloFUnc.prototype.call = function (func) {
+    func ? func(this.greeting) : this.func(this.greeting);
+}
+
+var userFunc = function (greeting) {
+    console.log(greeting);
+}
+
+var objHello = new HelloFUnc();
+objHello.func = userFunc;
+objHello.call();
+//정해진 형식의 함수를 콜백해주는 라이브러리가 있을 경우, 그 정해진 형식과는 다른 형식의 사용자 정의 함수를
+//호출할 때 유용하다.
+// +
+function saySomething(obj, methodName, name) {
+    return (function (greeting) {
+        return obj[methodName](greeting, name)
+    });
+}
+
+function newObj(obj, name) {
+    obj.func = saySomething(this, 'who', name);
+    return obj;
+}
+
+newObj.prototype.who = function (greeting, name) {
+    console.log(greeting + ' ' + (name || "everyone"));
+}
+
+var obj1 = new newObj(objHello, 'zzoon');
+obj1.call();
+
+//함수의 캡슐화
+var getCompletedStr = (function () {
+    var buffar = [
+        'I am',
+        '',
+        '. I live in ',
+        '',
+        ". I'm ",
+        '',
+        ' years old.'
+    ];
+
+    return (function (name, city, age) {
+        buffar[1] = name;
+        buffar[3] = city;
+        buffar[5] = age;
+
+        return buffar.join('');
+    })
+})()
+
+var str = getCompletedStr('zzoon', 'seoul', 20);
+console.log(str);
+
+//setTimeout()에 지정되는 함수의 사용자 정의
+function callLater(obj, a, b) {
+    return (function() {
+        obj['sum'] = a+b;
+        console.log(obj["sum"]);
+    })
+}
+
+var sumObj = {
+    sum : 0
+}
+
+var func = callLater(sumObj, 1, 2);
+setTimeout(func, 500);
+
+/**
+ * 5.4.3 클로저 사용시 주의사항
+ * 1. 클로저의 프로퍼티 값이 쓰기 가능이므로 그 값이 항상 변할 수 있음을 조심
+ * 2. 여러 개의 클로저가 같은 스코프 체인에 들어가 있을수 있다
+ * 3. 루프 안에서 클로저를 활용할 떄는 주의하자 참조값을 넣어주면 안됨
+ *  */
