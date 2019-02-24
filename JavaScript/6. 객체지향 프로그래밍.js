@@ -12,11 +12,11 @@
 function Person(arg) {
     this.name = arg;
 
-    Person.prototype.getName = function () {
+    this.getName = function () {
         return this.name;
     }
 
-    Person.prototype.setName = function (value) {
+    this.setName = function (value) {
         this.name = value;
     }
 }
@@ -35,6 +35,20 @@ var c = new Person("c");
  * -> 생성자 함수의 프로토타입에 메서드를 추가하면 한번만 생성되게 할 수 있음
  * => 메서드는 프로토타입에 정의하자
  */
+//수정
+function Person(arg) {
+    this.name = arg;
+
+    Person.prototype.getName = function () {
+        return this.name;
+    }
+
+    Person.prototype.setName = function (value) {
+        this.name = value;
+    }
+}
+
+
 //메서드를 추가하는 함수
 Function.prototype.method = function (name, func) {
     this.prototype[name] = func;
@@ -44,11 +58,11 @@ function Person(arg) {
     this.name = arg;
 }
 
-Person.method("setName", function(value) {
+Person.method("setName", function (value) {
     this.name = value;
 })
 
-Person.method("getName", function() {
+Person.method("getName", function () {
     return this.name;
 })
 
@@ -57,4 +71,129 @@ var you = new Person("you");
 console.log(me.getName());
 console.log(you.getName());
 
+//6.2 상속
+
+//프로토타입을 이요한 상속
+function create_object(o) {
+    function F() { }
+    F.prototype = o;
+    return new F(); //객체F의 부모에 인자객체를 넣고 F를 반환 즉 반환되는 객체는 자식
+}
+
+var person = {
+    name: 'zzoon',
+    getName: function () {
+        return this.name;
+    },
+    setName: function (arg) {
+        this.name = arg;
+    }
+};
+
+var student = create_object(person);
+
+student.setName("me");
+console.log(student.getName());
+// 자식 객체를 더 손쉽게 수정하는 방법으로 extended 함수 구현하기
+
+function extended(obj, prop) {
+    if (!prop) {prop = obj; obj = this;}
+    for(var i in prop) obj[i] = prop[i];
+    return obj;
+}
+
+function create_object(o) {
+    function F() { }
+    F.prototype = o;
+    return new F(); //객체F의 부모에 인자객체를 넣고 F를 반환 즉 반환되는 객체는 자식
+}
+
+var person = {
+    name: 'zzoon',
+    getName: function () {
+        return this.name;
+    },
+    setName: function (arg) {
+        this.name = arg;
+    }
+};
+
+var student = create_object(person);
+var added = {
+    setAge : function(age) {
+        this.age=age;
+    },
+    getAge : function() {
+        return this.age;
+    }
+};
+
+extended(student, added);
+
+student.setAge(25);
+console.log(student.getAge());
+
+//클래스 기반의 상속
+function Person(arg) {
+    this.name;
+}
+Person.prototype.setName = function(value) {
+    this.name = value;
+};
+
+Person.prototype.getName = function() {
+    return this.name;
+};
+
+function Student(arg) {
+    Person.apply(this, arguments)
+}
+
+var you = new Person("i am joo");
+Student.prototype = you;
+
+var me = new Student("zzoon");
+me.setName("zzoon");
+console.log(me.getName());
+//자식 클래스의 prototype이 부모인 구조이다
+//하지만 이대로는 자식 클래스의 protoype에 메서드를 추가하고자 할 때 문제가 생긴다.
+//중개자를 통해 해결
+function Person(arg) {
+    this.name = arg;
+}
+
+Function.prototype.method = function(name, func) {
+    this.prototype[name] = func;
+}
+
+Person.method("setName", function(value) {
+    this.name = value;
+});
+
+Person.method("getName", function(value) {
+    return this.name;
+});
+
+function Student(arg) {}
+
+function F() {};
+F.prototype = Person.prototype;
+Student.prototype = new F();
+Student.prototype.constructor = student;
+student.super = Person.prototype;
+var me = new Student();
+me.setName("zzoon");
+console.log(me.getName());
+//F라는 임시 객체를 Person.prototype과 student 사이에 두었다.
+
+//최적화 기법 클로저 활용
+var inherit = function(parent, child) {
+    var F = function() {};
+    return function(parent, chlid) {
+        F.prototype = parent.prototype;
+        child.prototype = new F();
+        child.prototype.constructor = child;
+        child.super = parent.prototype;
+    };
+}();
 
