@@ -97,8 +97,8 @@ console.log(student.getName());
 // 자식 객체를 더 손쉽게 수정하는 방법으로 extended 함수 구현하기
 
 function extended(obj, prop) {
-    if (!prop) {prop = obj; obj = this;}
-    for(var i in prop) obj[i] = prop[i];
+    if (!prop) { prop = obj; obj = this; }
+    for (var i in prop) obj[i] = prop[i];
     return obj;
 }
 
@@ -120,10 +120,10 @@ var person = {
 
 var student = create_object(person);
 var added = {
-    setAge : function(age) {
-        this.age=age;
+    setAge: function (age) {
+        this.age = age;
     },
-    getAge : function() {
+    getAge: function () {
         return this.age;
     }
 };
@@ -137,11 +137,11 @@ console.log(student.getAge());
 function Person(arg) {
     this.name;
 }
-Person.prototype.setName = function(value) {
+Person.prototype.setName = function (value) {
     this.name = value;
 };
 
-Person.prototype.getName = function() {
+Person.prototype.getName = function () {
     return this.name;
 };
 
@@ -162,21 +162,21 @@ function Person(arg) {
     this.name = arg;
 }
 
-Function.prototype.method = function(name, func) {
+Function.prototype.method = function (name, func) {
     this.prototype[name] = func;
 }
 
-Person.method("setName", function(value) {
+Person.method("setName", function (value) {
     this.name = value;
 });
 
-Person.method("getName", function(value) {
+Person.method("getName", function (value) {
     return this.name;
 });
 
-function Student(arg) {}
+function Student(arg) { }
 
-function F() {};
+function F() { };
 F.prototype = Person.prototype;
 Student.prototype = new F();
 Student.prototype.constructor = student;
@@ -187,13 +187,73 @@ console.log(me.getName());
 //F라는 임시 객체를 Person.prototype과 student 사이에 두었다.
 
 //최적화 기법 클로저 활용
-var inherit = function(parent, child) {
-    var F = function() {};
-    return function(parent, chlid) {
+var inherit = function (parent, child) {
+    var F = function () { };
+    return function (parent, chlid) {
         F.prototype = parent.prototype;
         child.prototype = new F();
         child.prototype.constructor = child;
         child.super = parent.prototype;
     };
 }();
+
+//6.3 캡슐화
+
+var Person = function (arg) {
+    var name = arg ? arg : "zzoon";
+    //this로 변수를 선언해주면 외부에서 접근할 수 있지만 var로 선언하면 외부에서 접근 불가
+    this.getName = function () {
+        return name;
+    }
+    this.setName = function (arg) {
+        name = arg;
+    }
+};
+
+var me = new Person;
+console.log(me.getName());
+me.setName("iamhjoo");
+console.log(me.getName());
+console.log(me.name);
+
+//좀더 다듬은 코드
+
+var Person = function (arg) {
+    var name = arg ? arg : "zzoon";
+
+    return {
+        getName: function () {
+            return name;
+        },
+        setName: function (arg) {
+            name = arg;
+        }
+    };
+}
+
+var me = Person();
+console.log(me.getName());
+//객체를 반환할 때는 참조값을 반환하므로 조심해야함
+//Person 객체의 프로토타입에는 접근할 수 없기 때문에 좋지 않음
+
+var Person = function (arg) {
+    var name = arg ? arg : "zzoon";
+
+    var Func = function () { }
+    Func.prototype = {
+        getName: function () {
+            return name;
+        },
+        setName: function (arg) {
+            name = arg;
+        }
+    };
+    return Func;
+}();
+//name은 private로 하고 클로저 Func를 반환하여 name에 간접적으로 접근 가능
+var me = new Person();
+console.log(me.getName());
+
+//6.4 객체지향 프로그래밍 응용 예제
+
 
