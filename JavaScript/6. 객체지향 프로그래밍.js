@@ -256,4 +256,81 @@ console.log(me.getName());
 
 //6.4 객체지향 프로그래밍 응용 예제
 
+//6.4.1 클래스 기능을 가진 subClass 함수 만들기
+//함수의 프로토타입 체인, extend함수, 인스턴스를 생성할 때 생성자 호출
+//subClass는 상속받을 클래스에 넣을 변수 빛 메서드가 담긴 객체를 인자로 받아 부모 함수를 상속받는 자식 클래스를 만든다.
+var SuperClass = subClass(obj);
+var SubClass = SuperClass.subClass(obj);
 
+function subClass(obj) {
+    // 1. 자식 클래스 (함수객체) 생성
+    // 2. 생성자 호출
+    // 3. 프로토타입 체인을 활용한 상속 구현
+    // 4. obj를 통해 들어온 변수 및 메서드를 자식 클래스에 추가
+    // 5. 자식 함수 객체 반환
+}
+
+function subClass(obj) {
+    var parent = this === window ? Function : this;
+    var F = function() {};
+
+    var child = function() {
+        var _parent = child.parent;
+
+        if(_parent && _parent !== Function) {
+            _parent.apply(this, arguments);
+        }
+
+        if(child.prototype._init) {
+            child.prototype._init.apply(this, arguments);
+        }
+    };
+
+    F.prototype = parent.prototype;
+    child.prototype = new F();
+    child.prototype.constructor = child;
+    child.parent = parent;
+    child.subClass = arguments.callee;
+
+    for(var i in obj) {
+        if(obj.hasOwnProperty(i)) {
+            child.prototype[i] = obj[i];
+        }
+    }
+
+    return child;
+}
+
+//활용 예제
+var person_obj = {
+    _init : function() {
+        console.log("person init");
+    },
+    getName : function() {
+        return this._name;
+    },
+    setName : function(name) {
+        this._name = name;
+    }
+};
+
+var student_obj = {
+    _init : function() {
+        console.log("student init");
+    },
+    getName : function() {
+        return "Student Name: " + this._name;
+    }
+};
+
+var Person = subClass(person_obj);
+var person = new Person();
+person.setName("zzoon");
+console.log(person.getName());
+
+var Student = Person.subClass(student_obj);
+var student = new Student();
+student.setName("iamhjoo");
+console.log(student.getName());
+
+console.log(Person.toString());
