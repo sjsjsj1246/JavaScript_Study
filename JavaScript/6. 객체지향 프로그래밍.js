@@ -272,16 +272,16 @@ function subClass(obj) {
 
 function subClass(obj) {
     var parent = this === window ? Function : this;
-    var F = function() {};
+    var F = function () { };
 
-    var child = function() {
+    var child = function () {
         var _parent = child.parent;
 
-        if(_parent && _parent !== Function) {
+        if (_parent && _parent !== Function) {
             _parent.apply(this, arguments);
         }
 
-        if(child.prototype._init) {
+        if (child.prototype._init) {
             child.prototype._init.apply(this, arguments);
         }
     };
@@ -292,8 +292,8 @@ function subClass(obj) {
     child.parent = parent;
     child.subClass = arguments.callee;
 
-    for(var i in obj) {
-        if(obj.hasOwnProperty(i)) {
+    for (var i in obj) {
+        if (obj.hasOwnProperty(i)) {
             child.prototype[i] = obj[i];
         }
     }
@@ -303,22 +303,22 @@ function subClass(obj) {
 
 //활용 예제
 var person_obj = {
-    _init : function() {
+    _init: function () {
         console.log("person init");
     },
-    getName : function() {
+    getName: function () {
         return this._name;
     },
-    setName : function(name) {
+    setName: function (name) {
         this._name = name;
     }
 };
 
 var student_obj = {
-    _init : function() {
+    _init: function () {
         console.log("student init");
     },
-    getName : function() {
+    getName: function () {
         return "Student Name: " + this._name;
     }
 };
