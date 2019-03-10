@@ -398,7 +398,7 @@ var Person = function (name, age, gender) {
 };
 
 var foo = new Person('foo', 33, 'woman');
-console.dir(foo); //foo
+console.dir(foo);
 
 var baz = new Person('baz', 25, 'woman');
 console.dir(baz);
