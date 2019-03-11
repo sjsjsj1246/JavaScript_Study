@@ -82,7 +82,7 @@ jQuery.fn = jQuery.prototype = {
  * 코드 곳곳에서 볼 수 있다.
  */
 
-jQuery.extand = jQuery.fn.extend = function (obj, prop) {
+jQuery.extend = jQuery.fn.extend = function (obj, prop) {
     if (!prop) { prop = obj; obj = this; } //1
     for (var i in prop) obj[i] = prop[i]; //2
     return obj;
@@ -104,23 +104,146 @@ jQuery.extand = jQuery.fn.extend = function (obj, prop) {
  * obj 인자로 넘긴 객체를 복사하는 결과가 된다.
  */
 
+//extend() 메서드를 호출하는 jQUery 소스코드
 jQuery.extend({
-    init: function(){
+    init: function () {
         jQuery.initDone = true;
         //~~~
     },
 
-    each: function(obj, fn, args) {
-        if(obj.length == undefined)
-            for(var i in obj)
-                fn.apply(obj[i], args||[i,obj[i]]);
+    each: function (obj, fn, args) {
+        if (obj.length == undefined)
+            for (var i in obj)
+                fn.apply(obj[i], args || [i, obj[i]]);
         else
-            for(var i =0;i<obj.length; i++)
-                fn.apply(obj[i], args||[i,obj[i]]);
+            for (var i = 0; i < obj.length; i++)
+                fn.apply(obj[i], args || [i, obj[i]]);
         return obj;
     }//,
     //~~~
 })
 
+//jQuery.fn.extend() 메서드를 호출하는 jQuery 코드.
+jQuery.fn.extend({
+
+    // We're overriding the old toggle function, so
+    // remember oi for lter
+    _toggle: jQuery.fn._toggle,
+    tpggle: function (a, b) {
+        // If two functions are passed in, we're
+        // toggleing on a click
+        //~~~
+    }
+})
+
+// 8.1.5 jQuery 소스 코드의 기본 구성 요소
+/**
+ * -jQuery 함수 객체
+ * -jQuery.prototrpe 겍체
+ * -jQuery 객체 인스턴스
+ *
+ * jQuery() 함수의 가장 기본적인 역할은 new 연산자로 jQuery 객체를 생성하는 것이다.
+ * 이렇게 생성된 jQUery 객체는 프로토타입 체이닝으로 jQuery.prototype 객체에 포함된
+ * 프로토타입 메서드를 호출할 수 있다.
+ * 또한, 여기서 주목할 점은 jQuery 함수 객체 자신이 메서드를 포함하고 있다는 것이다.
+ * jQuery 함수 객체의 메서드는 각각 생성된 jQUery인스턴스 객체에 특화되지 않고
+ * 범용적으로 사용되는 jQuery 코어 메서드로 구성된다.
+ */
 
 
+// 8.2 jQuery의 id 셀렉터 동작 분석
+// jQuery의 가장 기본적인 기능은 HTML 문서에서 원하는 DOM 객체를 선택한 후,
+// 해당 객체의 속성 변경이나 효과, 이벤트 등을 처리하는 것이다.
+
+/**
+ * <!DOCTYPE heml>
+ * <html>
+ * <head>
+ *  <script src="http://code.jquery.com/jquery-lastest.js"X/script>
+ * </head>
+ * <body>
+ *  <div id="myDiv">Hello</div>
+ *  <script>alert($("#myDiv").text())</script>
+ * </body>
+ * </html>
+ */
+
+// 경고창이 뜨면서 dix 태그로 둘러싸인 Hello 값이 나타난다.
+// 이제 jQuery가 위 코드를 어떻게 처리하는지 살펴보자
+
+// 8.2.1 $("#myDiv") 살펴보기
+/**
+ * $("#myDiv") = jQuery("#myDiv") 이며 첫번째 인자 a에는 문자열 "#myDiv"가 전달되고,
+ * 두번째 인자 c는 아무런 인자값이 전달되지 않으므로 undefined값이 설정된다.
+ */
+
+
+function jQuery(a, c) {
+
+    if (a && a.constructor == Function && jQuery.fn.ready)
+        return jQuery(document).ready(a);
+    // 1. a가 함수가 아니므로 실행이 안됨
+
+    a = a || jQuery.context || document;
+    // 2. a가 값이 있으므로 a 그대로 남아있는다.
+
+    if (a.jQuery)
+        return $(jQuery.merge(a, []));
+    // 3. a는 문자열이므로 jQuery프로퍼티를 가지지 않는다 따라서 실행되지 않음.
+    // 해당 객체가 jQuery 객체인지 아닌지를 확인하는 것이다.
+
+    if (c && c.jQuery)
+        return $(c).find(a);
+    // 4. c가 없으므로 거짓
+
+    if (window == this)
+        return new jQuery(a, c);
+    /**
+     * 5. jQuery 가 어떤 형태로 호출됐는지 체크한다. this가 전역 객체 window로 바인딩되는 경우는 jQuery()를
+     * 함수 형태로 호출하는 경우다. $("#myDiv")는 함수 호출 형태이므로 this는 전역 객체인 window에 바인딩된다.
+     * 따라서 참이므로 jQuery()함수가 new 연산자와 함께 생성자 함수 형태로 다시 호출된다.
+     * 생성자 함수로 호출돼도 1~4 까지는 앞의 실행경과와 같다. 반면에 5에서 jQuery가 생성자 함수로 호출될 경우
+     * this는 함수 호출 패턴에 따라 새로 생성되는 빈 객체에 바인딩되므로 window가 아니다. 이때 생성되는 객체는
+     * jQuery 객체로서 jQuery.prototype 객체를 자신의 [[Prototype]] 링크로 연결한다. 따라서 이 객체는
+     * 프로토타입 체이닝으로 jQuery.prototype 객체의 프로퍼티나 메서드에 접근할 수 있다. 경국 this가 window
+     * 객체로 바인딩 되지 않았으므로 if문이 실행되지 않고 다음으로 넘어간다.
+     */
+
+    var m = /^[^<]*(<.+>)[^>]*$/.exec(a);
+    if (m) a = jQuery.clean([m[1]]);
+    /**
+     * 6. 정규표현식
+     * - ^ 운자열의 시작
+     * - [^<]* 빈 문자열이나 < 문자를 제외한 모든 문자열
+     * - (<.+>) <>로 둘러싸인 문자나 문자열
+     * - [^>] 빈 문자열이나 > 문자를 제외한 문자나 문자열
+     * - $ 문자열의 끝
+     * m = 빈 문자열이나 < 문자를 제외한 문자열로 시작하고, 중간에 <> 형태의 문자나 문자열이 있으며
+     *  빈 문자열이나 > 문자를 제외한 문제나 문자열로 끝난다.
+     * exec(a) 를 통해 a = "#myDiv" 를 인자로 넘긴다.
+     * 조건이 맞지 않으므로 m은 null이 된다.
+     */ 
+
+    this.get(a.constructor == Array || a.length && !a.nodeType && a[0] != undefined &&
+        a[0].nodeType ?
+        // Assume that it is an array of DOM Elements
+        jQuery.merge(a, []) :
+
+        // Fine the matching elements and save them for later
+        jQuery.find(a, c));
+    /**
+     * 7. a.constructor == Array -> flase
+     * a.length = 6 -> true
+     * !a.nodeType -> !(undefined) -> true
+     * a[0] != undefined -> true
+     * a[0].nodeType -> false
+     * 따라서 전체는 false 그러므로 jQuery.find(a,c)문이 실행된다.
+     */
+
+    // See if an extra function was provided
+    var fn = arguments[arguments.length - 1];
+
+    // If so, excute it in context
+    if (fn && fn.constructor == Function)
+        this.each(fn);
+}
