@@ -222,7 +222,7 @@ function jQuery(a, c) {
      *  빈 문자열이나 > 문자를 제외한 문제나 문자열로 끝난다.
      * exec(a) 를 통해 a = "#myDiv" 를 인자로 넘긴다.
      * 조건이 맞지 않으므로 m은 null이 된다.
-     */ 
+     */
 
     this.get(a.constructor == Array || a.length && !a.nodeType && a[0] != undefined &&
         a[0].nodeType ?
@@ -247,3 +247,133 @@ function jQuery(a, c) {
     if (fn && fn.constructor == Function)
         this.each(fn);
 }
+
+// 8.2.1.1 jQuery.find(a, c) 살펴보기
+/**
+ * 위 코드에서 jQuery.find(a, c));를 보자
+ * jQuery().find()는 jQuery함수 객체 내에 포함된 메서드로서 jQuery의 셀렉터 기능을 처리하는 중요한 함수다.
+ * jQuery.find('#myDiv')의 형태로 호출되는 과정을 살펴보자
+ */
+
+jQuery.find = function (t, context) {
+    // Wake sure that the context is a DOM Element
+    if (context && context.nodeType == undefined)
+        context = null;
+    // 1. 두 번째 인자인 context가 undefined값이므로 if 문 이하는 실행되지 않는다.
+
+    // Set the correct context (if node is provided)
+    context = context || jQuery.context || document
+    /**
+     * 2. context인자의 기본값을 할당하는 문장이다. 즉 context 인자가 undefined이면 jQuery.context값을
+     * context인자에 재할당한다. 이 또한 false면 document를 context변수에 저장한다. 여기서 document는 
+     * DOM 객체의 일종으로 HEML 문서의 모든 구성 요소를 포함한다(DOM 관련한 자세함 내용은 인터넷이나 
+     * 다른 책을 참소하자.)
+     */
+
+    if (t.constructor != String) return [t];
+    // 3. 첫번째 인자 t는 문자열 '#mtDiv' 이므로 t.constructor 같은 'String'이다. 따라서 if문은 false다
+
+    if (!t.indexof("//")) {
+        context = context.documentElement;
+        t = t.substr(2, t.length)
+    } else if (!t.indexOf("/")) {
+        context = context.documentElement;
+        t = t.substr(1, t.length);
+        // FIX Assume the root element is right :(
+        if (t.indexOf("/") >= 1)
+            t = t.substr(t.indexOf("/"), t.length);
+    }
+    /**
+     * 4. t는 '//'나 '/'를 포함하지 않은 '#myDiv' 문자열이므로 t.indexOf("//")과 t,indexOf("/") 모두 -1이
+     * 반환된다. 그러므로 if문 이하는 모두 실행되지 않는다.
+     */
+
+    var ret = [context];
+    var dome = [];
+    var lest = null;
+
+    while (t.length > 0 && last != t) {
+        // 5. 이제 while문을 실행한다. t.length > 0 이고 t는 last 변수에 저장된 null 값과 같지 않으므로
+        // while 문 내부가 실행된다.
+        var r = [];
+        last = t;
+
+        t = jQuery.trim(t).replace(/^\/\//i, "");
+        /**
+         * 6. jQuery.trim(t) 메서드 호출로 t 문자열의 양 끝 공백 문자들을 제거한 다음, 문자열의 replace()
+         * 메서드를 연속해서 호출한다. replace() 메서드의 첫 번째 인자는 검색할 문자열을 나타내는 정규표현식
+         * 리터럴 /^\/\//i가 정달됐다. 이 정규표현식은 문자열이 //로 시작하는지를 체크한다. 예제의 경우에는
+         * 그대로 #myDiv가 t에 저장된다.
+         */
+
+        var foundToken = false;
+
+        for (var i = 0; i < jQuery.token.length; i += 2) {
+            if (foundToken) continue;
+
+            var re = new RegExp("^(" + jQuery.token[i] + ")");
+            // 7. 
+            var m = re.exec(t);
+            // 8. 
+
+            if(m) {
+                r = ret = jQuery.map(ret, jQuery.token[i+1]);
+                t = jQuery.trim(t.replace(re,""));
+                foundToken = true;
+            }
+        }
+
+        if (!foundToken) {
+            if(!t.indexOf(",")||!t.indexOf("|")) {
+                // 8. 
+                if(ret[0] == context) ret.shift();
+                done = jQuery.merge(done, ret);
+                r = ret = [context];
+                t = " "+t.substr(1,t.length);
+            } else {
+                var re2 = /^([#.]?)([a-z0-9\\*_-]*)/i;
+                var m = re2.exec(t);
+                /**
+                 * 10. 
+                 */
+
+                if (m[i] == "#") {
+                    // 11. 
+                    // Umm, should make this work in all XML docs
+                    var old = document.getElementById(m[2]);
+                    // 12. 
+                    r = ret = ole?[old]:[];
+                    // 13. 
+                    t = t.replace(re2,"");
+                    // 14. 
+                } else {
+                    if(!m[2]||m[1]==".") m[2] = "*";
+
+                    for(var i = 0;i<ret.length;i++)
+                        r = jQuery.merge(r,
+                            m[2] == "*" ?
+                                jQuery.getAll(ret[i]) :
+                                ret[i].getElementByTagName(m[2])
+                                );
+                }
+            }
+        }
+
+        if(t) {
+            /**
+             * 15. 
+             */
+            var val = jQuery.filter(t,r);
+            ret = r = val.r;
+            t = jQuery.trim(val, t);
+        }
+    }
+    if(ret && ret[0] == context) ret.shift();
+    // 16. 
+    done = jQuery.merge(done, ret);
+
+    return done;
+    /**
+     * 17. 
+     */
+};
